@@ -1,93 +1,61 @@
-# Prime Utility Library
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdbool.h>
+#include <dlfcn.h>
 
-## **설명**  
-이번에 만들게된 라이브러리는 소수와 관련된 두 가지 기능을 가진 라이브러리입니다.
-1. **소수 판별 (`is_prime`)**: 입력된 숫자가 소수인지 확인
-2. **소수 목록 생성 (`generate_primes`)**: 지정된 범위 내의 모든 소수를 생성하여 반환
----
-## **빌드 방법**
+int main() {
+    void *handle;
+    bool (*is_prime)(int);
+    int *(*generate_primes)(int, int *);
+    char *error;
 
-### **1. 정적 라이브러리 (`libcustom.a`)**  
-1. 소스 코드를 컴파일합니다
-   ```bash
-   gcc -c library.c -o library.o
-   ```
-2. 정적 라이브러리를 생성합니다
-   ```bash
-   ar rcs libcustom.a library.o
-   ```
+    // 공유 라이브러리 로드
+    handle = dlopen("./libcustom.so", RTLD_LAZY);
+    if (!handle) {
+        fprintf(stderr, "%s\n", dlerror());
+        exit(EXIT_FAILURE);
+    }
 
-### **2. 공유 라이브러리 (`libcustom.so`)**  
-1. 위치 독립 코드(PIC)를 사용하여 소스 코드를 컴파일합니다
-   ```bash
-   gcc -fPIC -c library.c -o library.o
-   ```
-2. 공유 라이브러리를 생성합니다
-   ```bash
-   gcc -shared -o libcustom.so library.o
-   ```
+    // 함수 로드
+    is_prime = dlsym(handle, "is_prime");
+    generate_primes = dlsym(handle, "generate_primes");
 
----
+    if ((error = dlerror()) != NULL) {
+        fprintf(stderr, "%s\n", error);
+        dlclose(handle);
+        exit(EXIT_FAILURE);
+    }
 
-## **테스트 방법**
+    // 사용자 입력을 통해 소수 판별
+    int num;
+    printf("Enter a number between 1 and 50: ");
+    scanf("%d", &num);
 
-### **1. 정적 라이브러리 테스트**
-1. 테스트 프로그램을 컴파일합니다
-   ```bash
-   gcc static_test.c -L. -lcustom -o static_test
-   ```
-2. 테스트 프로그램을 실행합니다
-   ```bash
-   ./static_test
-   ```
+    if (num < 1 || num > 50) {
+        printf("Number out of range. Please enter a number between 1 and 50.\n");
+    } else if (is_prime(num)) {
+        printf("%d is a prime number.\n", num);
+    } else {
+        printf("%d is not a prime number.\n", num);
+    }
 
-### **2. 공유 라이브러리 테스트**
-1. 공유 라이브러리 테스트 프로그램을 컴파일합니다
-   ```bash
-   gcc dynamic_test.c -ldl -o dynamic_test
-   ```
-2. 테스트 프로그램을 실행합니다
-   ```bash
-   ./dynamic_test
-   ```
+    // 소수 목록 생성 테스트
+    int limit = 50;
+    int prime_count = 0;
+    int *primes = generate_primes(limit, &prime_count);
 
----
+    if (primes) {
+        printf("Primes up to %d: ", limit);
+        for (int i = 0; i < prime_count; i++) {
+            printf("%d ", primes[i]);
+        }
+        printf("\n");
+        free(primes); // 메모리 해제
+    } else {
+        printf("Failed to generate primes.\n");
+    }
 
-## **사용 예시**
-
-### **정적 테스트 출력**
-`static_test.c` 프로그램의 예제 출력은 다음과 같습니다:  
-```plaintext
-Enter a number between 1 and 50: 29
-29 is a prime number.
-Primes up to 50: 2 3 5 7 11 13 17 19 23 29 31 37 41 43 47
-```
-
-### **동적 테스트 출력**
-`dynamic_test.c` 프로그램의 예제 출력은 다음과 같습니다:  
-```plaintext
-Enter a number between 1 and 50: 25
-25 is not a prime number.
-Primes up to 50: 2 3 5 7 11 13 17 19 23 29 31 37 41 43 47
-```
-
----
-
-## **라이브러리 함수 설명**
-
-### **1. `bool is_prime(int num)`**
-- **설명:** 입력된 숫자가 소수인지 확인합니다.  
-- **입력:** 
-  - `num`: 소수 여부를 확인할 정수.  
-- **출력:** 
-  - 소수이면 `true`, 아니면 `false`를 반환합니다.
-
-### **2. `int *generate_primes(int limit, int *prime_count)`**
-- **설명:** 지정된 범위 내의 모든 소수를 생성하여 동적 배열로 반환합니다.  
-- **입력:**
-  - `limit`: 소수를 생성할 범위의 상한값.
-  - `prime_count`: 생성된 소수의 개수를 저장할 포인터.  
-- **출력:**
-  - 동적 배열로 소수 목록을 반환하며, 사용 후 반드시 `free`를 호출하여 메모리를 해제해야 합니다.
----
-**이상입니다, 감사합니다!**
+    // 라이브러리 닫기
+    dlclose(handle);
+    return 0;
+}
