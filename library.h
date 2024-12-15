@@ -1,13 +1,12 @@
 #ifndef LIBRARY_H
 #define LIBRARY_H
 
-// ¹®ÀÚ¿­ ±æÀÌ °è»ê ÇÔ¼ö
-int string_length(const char* str);
+#include <stdbool.h>
 
-// °ö¼À ÇÔ¼ö
-int multiply(int a, int b);
+// ì†Œìˆ˜ íŒë³„ í•¨ìˆ˜: ì£¼ì–´ì§„ ìˆ«ìê°€ ì†Œìˆ˜ì¸ì§€ í™•ì¸
+bool is_prime(int num);
 
-// ³ª´°¼À ÇÔ¼ö
-float divide(float a, float b);
+// ë²”ìœ„ ë‚´ ì†Œìˆ˜ ëª©ë¡ ìƒì„±: ì†Œìˆ˜ë¥¼ ë™ì  ë°°ì—´ë¡œ ë°˜í™˜í•˜ê³  ê°œìˆ˜ë¥¼ prime_countì— ì €ì¥
+int* generate_primes(int limit, int* prime_count);
 
 #endif // LIBRARY_H

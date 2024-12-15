@@ -1,26 +1,35 @@
 #include "library.h"
-#include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 
-// ¹®ÀÚ¿­ ±æÀÌ °è»ê ÇÔ¼ö
-int string_length(const char* str) {
-    int length = 0;
-    while (*str++) {
-        length++;
+// ì†Œìˆ˜ íŒë³„ í•¨ìˆ˜
+bool is_prime(int num) {
+    if (num < 2) return false;
+    for (int i = 2; i * i <= num; i++) {
+        if (num % i == 0) return false;
     }
-    return length;
+    return true;
 }
 
-// °ö¼À ÇÔ¼ö
-int multiply(int a, int b) {
-    return a * b;
-}
-
-// ³ª´°¼À ÇÔ¼ö
-float divide(float a, float b) {
-    if (b == 0) {
-        fprintf(stderr, "Error: Division by zero.\n");
-        exit(EXIT_FAILURE);
+// ë²”ìœ„ ë‚´ ì†Œìˆ˜ ëª©ë¡ ìƒì„± í•¨ìˆ˜
+int* generate_primes(int limit, int* prime_count) {
+    if (limit < 2) {
+        *prime_count = 0;
+        return NULL;
     }
-    return a / b;
+
+    int* primes = malloc(sizeof(int) * (limit / 2)); // ë©”ëª¨ë¦¬ í• ë‹¹
+    if (!primes) {
+        *prime_count = 0;
+        return NULL;
+    }
+
+    *prime_count = 0;
+    for (int i = 2; i <= limit; i++) {
+        if (is_prime(i)) {
+            primes[*prime_count] = i;
+            (*prime_count)++;
+        }
+    }
+    return primes;
 }
