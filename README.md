@@ -40,6 +40,7 @@
    ```bash
    ./static_test
    ```
+<img width="569" alt="static" src="https://github.com/user-attachments/assets/d9eb3f26-e8d7-4a0e-b39c-bd328fb57a3e" />
 
 ### **2. 공유 라이브러리 테스트**
 1. 공유 라이브러리 테스트 프로그램을 컴파일합니다
@@ -50,6 +51,7 @@
    ```bash
    ./dynamic_test
    ```
+<img width="534" alt="dynamic" src="https://github.com/user-attachments/assets/3cfe8c09-afea-43c3-829e-beb85d613eaa" />
 
 ---
 
